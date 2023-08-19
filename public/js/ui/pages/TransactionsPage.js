@@ -1,67 +1,69 @@
-/**
- * Класс TransactionsPage управляет
- * страницей отображения доходов и
- * расходов конкретного счёта
- * */
 class TransactionsPage {
-  /**
-   * Если переданный элемент не существует,
-   * необходимо выкинуть ошибку.
-   * Сохраняет переданный элемент и регистрирует события
-   * через registerEvents()
-   * */
   constructor( element ) {
+    if (!element) {
+      throw new Error('Пустой элемент');
+    }
 
+    this.element = element;
+    this.registerEvents()
   }
 
-  /**
-   * Вызывает метод render для отрисовки страницы
-   * */
   update() {
-
+    this.render(this.lastOptions);
   }
 
-  /**
-   * Отслеживает нажатие на кнопку удаления транзакции
-   * и удаления самого счёта. Внутри обработчика пользуйтесь
-   * методами TransactionsPage.removeTransaction и
-   * TransactionsPage.removeAccount соответственно
-   * */
   registerEvents() {
-
+    this.element.addEventListener('click', event => {
+      if (event.target.classList.contains('remove-account')) {
+        this.removeAccount();
+      } else if (event.target.classList.contains('transaction__remove')) {
+        const transactionId = event.target.getAttribute('data-id');
+        this.removeTransaction(transactionId);
+      }
+    })
   }
 
-  /**
-   * Удаляет счёт. Необходимо показать диаголовое окно (с помощью confirm())
-   * Если пользователь согласен удалить счёт, вызовите
-   * Account.remove, а также TransactionsPage.clear с
-   * пустыми данными для того, чтобы очистить страницу.
-   * По успешному удалению необходимо вызвать метод App.updateWidgets() и App.updateForms(),
-   * либо обновляйте только виджет со счетами и формы создания дохода и расхода
-   * для обновления приложения
-   * */
   removeAccount() {
-
+    if (this.lastOptions) {
+      const confiramation = window.confirm('Вы действительно хотите удалить счёт?');
+      if (confiramation) {
+        Account.remove(this.lastOptions.account_id, (error, response)=> {
+          if (response.success) {
+            App.updateWidgets();
+            App.updateForms();
+          } else {
+            console.error('Ошибка при удалении счёта:', error);
+          }
+        });
+      }
+    }
   }
 
-  /**
-   * Удаляет транзакцию (доход или расход). Требует
-   * подтверждеия действия (с помощью confirm()).
-   * По удалению транзакции вызовите метод App.update(),
-   * либо обновляйте текущую страницу (метод update) и виджет со счетами
-   * */
   removeTransaction( id ) {
-
+    const confiramation = window.confirm('Вы действительно хотите удалить эту транзакцию?');
+    if (confiramation) {
+      Transaction.remove(id, (error, response) => {
+        if (response.success) {
+          App.update();
+        } else {
+          console.error('Ошибка при удалении транзакции:', error);
+        }
+      });
+    }
   }
 
-  /**
-   * С помощью Account.get() получает название счёта и отображает
-   * его через TransactionsPage.renderTitle.
-   * Получает список Transaction.list и полученные данные передаёт
-   * в TransactionsPage.renderTransactions()
-   * */
   render(options){
+    if (options.account_id) {
+      this.lastOptions = options;
 
+      Account.get(options.account_id, (error, response) => {
+        if (response.success) {
+          this.renderTitle(response.data.name);
+        } else {
+          console.error('Ошибка при получении информации о счете:', error);
+        }
+      })
+    }
   }
 
   /**

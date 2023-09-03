@@ -1,6 +1,6 @@
 const createRequest = (options = {}) => {
-  try {
   const xhr = new XMLHttpRequest();
+
   xhr.onload = () => {
     if (xhr.readyState === xhr.DONE) {
       if (xhr.status === 200) {
@@ -29,7 +29,5 @@ const createRequest = (options = {}) => {
 
     xhr.send(formData);
   }
- } catch(erorr) {
-  options.callback(erorr, null);
- }
 };
+

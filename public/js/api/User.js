@@ -35,12 +35,7 @@ class User {
     createRequest(options);
   }
 
-  /**
-   * Производит попытку авторизации.
-   * После успешной авторизации необходимо
-   * сохранить пользователя через метод
-   * User.setCurrent.
-   * */
+
   static login(data, callback) {
     createRequest({
       url: this.URL + '/login',

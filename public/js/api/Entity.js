@@ -1,18 +1,14 @@
 class Entity {
   static URL = '';
+
   static list(data, callback){
-    try {
     const options = {
       method: 'GET',
       url: this.URL,
       data: data,
       callback: callback,
     };
-
-    createRequest(options);
-   } catch (error) {
-    options.callback(error, null);
-   }
+    createRequest(this.options);   
   }
 
   static create(data, callback) {
@@ -26,7 +22,7 @@ class Entity {
     
     createRequest(options);
     } catch (error) {
-      options.callback(error, null);
+      this.options.callback(error, null);
       }
     }
 
@@ -41,7 +37,7 @@ class Entity {
   
       createRequest(options);
      } catch (error) {
-      options.callback(error, null);
+      this.options.callback(error, null);
      }
     }
   }
